@@ -8,12 +8,12 @@ npm install hono-kv-session
 
 ## Setup KV
 - Cloudflare Workers
-  1. Create KV namespace the bind name `SESSION`
+  1. Create KV namespace the bind name `SESSION`.  
      `$ wrangler kv:namespace create SESSION`
-  2. Set the UUID of the KV namespace generated in `1.` to `wrangler.toml`
+  2. Set the UUID of the KV namespace generated in `1.` to `wrangler.toml`.  
      Like, `{ binding = "SESSION", id = "b80d8fc5924d43ba85b56aa6b6dbb1c3" }`
 - Bun, Node.js, etc.
-  1. Just start the Redis server
+  1. Just start the Redis server.  
      For systemd: `# systemctl start redis-server`
 
 ## Usage
@@ -41,7 +41,7 @@ You can see the sample code in the `./dev` directory in Github.
      secret: 'Strong_Secret_123' // Default: null
    }))
    ```
-   - `secret` is secret of Hono's signed cookies. (This feature has untested.)
+   - `secret` is secret of Hono's signed cookies (This feature has untested).  
      See Hono's [Cookie Helper](https://hono.dev/helpers/cookie) documentation for details.
 
 3. Get session data
@@ -96,11 +96,11 @@ You can see the sample code in the `./dev` directory in Github.
    ```
 
 ## Session Format
-- in Key-Value store: `session:<hostname>:<uuid>` and value
-  Key: `session:www.example.com:49b0b962-5b95-43c6-9e00-94ce1313d0ed`
-  Value: `user01`
-- in Cookie: `id=49b0b962-5b95-43c6-9e00-94ce1313d0ed`
-- in `c.session`:
+- in Key-Value store: `session:<hostname>:<uuid>` and `value`  
+  Key: `session:www.example.com:49b0b962-5b95-43c6-9e00-94ce1313d0ed`  
+  Value: `user01`  
+- in Cookie: `id=49b0b962-5b95-43c6-9e00-94ce1313d0ed`  
+- in `c.session`  
   ```js
   c.session = {
     session: 'user01' // KV value
@@ -124,7 +124,7 @@ You can see the sample code in the `./dev` directory in Github.
 
 ## Dependecies
 - [hono](https://hono.dev/)
-- [node-redis](https://github.com/redis/node-redis/tree/master)
+- [node-redis](https://github.com/redis/node-redis)
 
 ## License
 MIT
