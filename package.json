@@ -33,7 +33,7 @@
     "minify:kv": "esbuild --minify --outdir=dist/kv src/kv/*",
     "dev": "wrangler dev dev/worker.js",
     "dev:bun": "bun run --hot dev/index.js",
-    "deploy": "wrangler deploy --minify dev/index.js"
+    "deploy": "wrangler deploy --minify dev/worker.js"
   },
   "repository": {
     "type": "git",
