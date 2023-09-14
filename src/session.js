@@ -56,9 +56,9 @@ export const createSession = async (c, value, {
   }
 
   if (secret) {
-    setSignedCookie(c, c.session.name, session, cookieOptions)
+    setSignedCookie(c, c.session.name, session, secret, cookieOptions)
   } else {
-    setCookie(c, c.session.name, session, secret, cookieOptions)
+    setCookie(c, c.session.name, session, cookieOptions)
   }
 
   return session
