@@ -1,0 +1,66 @@
+{
+  "name": "hono-kv-session",
+  "version": "0.1.0",
+  "description": "Session middleware for Hono with Cloudflare KV or node-redis",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/cjs/index.js",
+  "type": "module",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./bun": {
+      "import": "./dist/kv/bun.js",
+      "require": "./dist/cjs/kv/bun.js"
+    },
+    "./cloudflare": {
+      "import": "./dist/kv/cloudflare.js",
+      "require": "./dist/cjs/kv/cloudflare.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:esm && npm run build:esm:kv && npm run build:cjs && npm run build:cjs:kv",
+    "build:esm": "esbuild --outdir=dist src/*.js",
+    "build:esm:kv": "esbuild --outdir=dist/kv src/kv/*.js",
+    "build:cjs": "esbuild --format=cjs --outdir=dist/cjs src/*.js",
+    "build:cjs:kv": "esbuild --format=cjs --outdir=dist/cjs/kv src/kv/*.js",
+    "minify": "npm run minify:session && npm run minify:kv",
+    "minify:session": "esbuild --minify --outdir=dist src/index.js src/session.js",
+    "minify:kv": "esbuild --minify --outdir=dist/kv src/kv/*",
+    "dev": "wrangler dev dev/worker.js",
+    "dev:bun": "bun run --hot dev/index.js",
+    "deploy": "wrangler deploy --minify dev/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shinosaki/hono-kv-session.git"
+  },
+  "keywords": [
+    "hono",
+    "session",
+    "bun",
+    "cloudflare",
+    "workers",
+    "kv",
+    "redis"
+  ],
+  "author": "Shinosaki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shinosaki/hono-kv-session/issues"
+  },
+  "homepage": "https://github.com/shinosaki/hono-kv-session",
+  "dependencies": {
+    "hono": "^3.6.0",
+    "redis": "^4.6.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230821.0",
+    "esbuild": "^0.19.3",
+    "wrangler": "^3.7.0"
+  }
+}
