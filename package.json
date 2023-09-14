@@ -1,6 +1,6 @@
 {
   "name": "hono-kv-session",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Stateful session middleware for Hono. Works with Cloudflare KV or node-redis.",
   "files": [
     "dist"
