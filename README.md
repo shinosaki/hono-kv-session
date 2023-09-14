@@ -122,5 +122,9 @@ You can see the sample code in the `./dev` directory in Github.
 | ✔️ | Node.js | ❌ |
 | ❌ | Deno |  |
 
+## Dependecies
+- [hono](https://hono.dev/)
+- [node-redis](https://github.com/redis/node-redis/tree/master)
+
 ## License
 MIT
