@@ -1,6 +1,10 @@
 # hono-kv-session
 Stateful session middleware for [Hono](https://hono.dev/). Works on Cloudflare Workers, Node.js, Bun, etc.
 
+ステートフルなセッションを提供するHonoのミドルウェアです。Cloudflare WorkersやNode.js、Bunなどの環境で動作します。
+
+[日本語版ドキュメント](./README.ja.md)
+
 ## Installation
 ```
 npm install hono-kv-session
@@ -17,7 +21,7 @@ npm install hono-kv-session
      For systemd: `# systemctl start redis-server`
 
 ## Usage
-You can see the sample code in the `./dev` directory in Github.
+You can see the sample code in the [`./dev`](./dev) directory in Github.
 
 1. Set `kvClient()` middleware.
    ```js
@@ -50,7 +54,7 @@ You can see the sample code in the `./dev` directory in Github.
      const { value, key, name } = c.session;
      return c.json({
        username: value,
-       session_id: key, // Default: crypto.randomUUID()'s uuid'
+       session_id: key, // Default: crypto.randomUUID()'s uuid
        cookie_id: name,
      })
    })
