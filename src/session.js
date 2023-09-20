@@ -24,11 +24,13 @@ export const SessionManager = (options = {}) => {
   }
 }
 
-export const createSession = async (c, value, {
-  ttl = 604800, // 1 week
-  session = crypto.randomUUID(),
-  secret
-}) => {
+export const createSession = async (c, value, options = {}) => {
+  let {
+    ttl = 604800, // 1 week
+    session = crypto.randomUUID(),
+    secret
+  } = options;
+
   const { kv } = c
   const url = new URL(c.req.url)
   const runtime = getRuntimeKey()
