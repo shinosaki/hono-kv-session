@@ -20,6 +20,10 @@ export const SessionManager = (options = {}) => {
     c.session.key = (secret) ? await getSignedCookie(c, secret, name) : getCookie(c, name)
     c.session.value = (c.session.key) && await kv.get(`session:${url.hostname}:${c.session.key}`)
 
+    if (!c.session.value) {
+      return c.json({ status: false, message: 'Invalid session' }, 401);
+    };
+
     await next();
   }
 }
