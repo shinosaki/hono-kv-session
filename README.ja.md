@@ -16,7 +16,7 @@ npm install hono-kv-session
 ## 使い方
 Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサンプルコードがあります。
 
-1. `kvClient()`ミドルウェアの設定
+- `kvClient()`ミドルウェアの設定
    ```js
    // "Cloudflare Workers"か"Pages Functions"を利用している場合
    import { kvClient } from 'hono-kv-session/cloudflare';
@@ -26,7 +26,7 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    app.use('*', kvClient());
    ```
 
-2. `SessionManager()`ミドルウェアの設定
+- `SessionManager()`ミドルウェアの設定
    ```js
    import { SessionManager, createSession, deleteSession } from 'hono-kv-session'
    
@@ -41,19 +41,41 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    - `secret`にはHonoのSigned cookie用のシークレットを設定します （ただし、この機能は動作未確認です）。  
      Signed Cookieの詳細は、Honoの[Cookie Helper](https://hono.dev/helpers/cookie)ドキュメントを参照してください。
 
-3. セッションデータを取得
+- セッションデータを取得
    ```js
    app.get('/', async (c) => {
-     const { value, key, name } = c.session;
+     const { value, key, name, status } = c.session;
      return c.json({
        username: value,
        session_id: key, // デフォルト: crypto.randomUUID() で設定されたUUID
        cookie_id: name,
+       status,
      })
    })
    ```
 
-4. セッションの作成
+- アクセス拒否
+  `denyAccess()`ミドルウェアを挟まないと、不正なセッションを拒否せずアクセスされてしまいます。
+  `c.session.status = true|false`を参照することで、特定のルートやHTTPメソッドのみを対象としたアクセス制限が可能です。
+  ```js
+  import { denyAccess } from 'hono-kv-session';
+
+  // If JSON
+  app.use('*', denyAccess({
+    type: 'json', // 'json' or 'html' or 'text'
+    status: 401, // status code
+    response: { status: false, message: 'Invalid session' }
+  }))
+
+  // If HTML
+  app.use('*', denyAccess({
+    type: 'html', // 'json' or 'html' or 'text'
+    status: 401, // status code
+    response: '<p>Invalid session</p>'
+  }));
+  ```
+
+- セッションの作成
    ```js
    app.post('/login', async (c) => {
      // FormDataからユーザ名を取得
@@ -69,7 +91,7 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    })
    ```
 
-5. セッションの更新
+- セッションの更新
    ```js
    app.get('/renew', async (c) => {
      const { value, key } = c.session;
@@ -84,7 +106,7 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    })
    ```
 
-6. セッションの削除
+- セッションの削除
    KV上のデータとクライアントのCookieを削除します。
    ```js
    app.post('/logout', async (c) => {

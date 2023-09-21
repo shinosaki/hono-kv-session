@@ -23,7 +23,7 @@ npm install hono-kv-session
 ## Usage
 You can see the sample code in the [`./dev`](./dev) directory in Github.
 
-1. Set `kvClient()` middleware.
+- Set `kvClient()` middleware.
    ```js
    // If you are using "Cloudflare Workers" or "Pages Functions".
    import { kvClient } from 'hono-kv-session/cloudflare';
@@ -33,7 +33,7 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    app.use('*', kvClient());
    ```
 
-2. Set `SessionManager()` middleware.
+- Set `SessionManager()` middleware.
    ```js
    import { SessionManager, createSession, deleteSession } from 'hono-kv-session'
    
@@ -48,19 +48,41 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    - `secret` is secret of Hono's signed cookies (This feature has untested).  
      See Hono's [Cookie Helper](https://hono.dev/helpers/cookie) documentation for details.
 
-3. Get session data
+- Get session data
    ```js
    app.get('/', async (c) => {
-     const { value, key, name } = c.session;
+     const { value, key, name, status } = c.session;
      return c.json({
        username: value,
        session_id: key, // Default: crypto.randomUUID()'s uuid
        cookie_id: name,
+       status,
      })
    })
    ```
 
-4. Create session
+- Deny Access
+  If you don’t use the `denyAccess()` middleware, unauthorized sessions will not be denied and will be able to access the system.
+  By referencing `c.session.status = true|false`, you can restrict access to specific routes or HTTP methods.
+  ```js
+  import { denyAccess } from 'hono-kv-session';
+
+  // If JSON
+  app.use('*', denyAccess({
+    type: 'json', // 'json' or 'html' or 'text'
+    status: 401, // status code
+    response: { status: false, message: 'Invalid session' }
+  }))
+
+  // If HTML
+  app.use('*', denyAccess({
+    type: 'html', // 'json' or 'html' or 'text'
+    status: 401, // status code
+    response: '<p>Invalid session</p>'
+  }));
+  ```
+
+- Create session
    ```js
    app.post('/login', async (c) => {
      // Extract client's username from FormData
@@ -76,7 +98,7 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    })
    ```
 
-5. Renewal session
+- Renewal session
    ```js
    app.get('/renew', async (c) => {
      const { value, key } = c.session;
@@ -91,7 +113,7 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    })
    ```
 
-6. Delete session
+- Delete session
    ```js
    app.post('/logout', async (c) => {
      await deleteSession(c)

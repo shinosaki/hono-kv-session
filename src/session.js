@@ -20,8 +20,22 @@ export const SessionManager = (options = {}) => {
     c.session.key = (secret) ? await getSignedCookie(c, secret, name) : getCookie(c, name)
     c.session.value = (c.session.key) && await kv.get(`session:${url.hostname}:${c.session.key}`)
 
-    if (!c.session.value) {
-      return c.json({ status: false, message: 'Invalid session' }, 401);
+    c.session.status = (!c.session.value) ? false : true;
+
+    await next();
+  }
+}
+
+export const denyAccess = (options = {}) => {
+  const {
+    type = 'json',
+    status = 401,
+    response = { status: false, message: 'Invalid session' }
+  } = options;
+
+  return async (c, next) => {
+    if (!c.session.status) {
+      return c[type](response, status);
     };
 
     await next();
