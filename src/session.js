@@ -5,7 +5,10 @@ import { getCookie, getSignedCookie, setCookie, setSignedCookie, deleteCookie } 
 export const SessionManager = (options = {}) => {
   const {
     name = 'id',
-    secret
+    ttl = 604800, // 1 week
+    secret,
+    renew = true,
+    regenerate,
   } = options
 
   return async (c, next) => {
@@ -17,10 +20,17 @@ export const SessionManager = (options = {}) => {
       throw new HTTPException(500, { message: 'SessionManager Error: Key-Value store not available' }) 
     }
 
+    c.session.ttl = ttl
     c.session.key = (secret) ? await getSignedCookie(c, secret, name) : getCookie(c, name)
     c.session.value = (c.session.key) && await kv.get(`session:${url.hostname}:${c.session.key}`)
 
     c.session.status = (!c.session.value) ? false : true;
+
+    if (regenerate) {
+      await regenerateSession(c)
+    } else if (renew) {
+      renewSession(c)
+    }
 
     await next();
   }
@@ -44,7 +54,7 @@ export const denyAccess = (options = {}) => {
 
 export const createSession = async (c, value, options = {}) => {
   let {
-    ttl = 604800, // 1 week
+    // ttl = 604800, // 1 week
     session = crypto.randomUUID(),
     secret
   } = options;
@@ -55,14 +65,14 @@ export const createSession = async (c, value, options = {}) => {
 
   const key = `session:${url.hostname}:${session}`;
 
-  if (ttl < 60) {
-    ttl = 60
+  if (c.session.ttl < 60) {
+    c.session.ttl = 60
   }
 
   if (runtime === 'workerd') {
-    await kv.put(key, value, { expirationTtl: ttl })
+    await kv.put(key, value, { expirationTtl: c.session.ttl })
   } else {
-    await kv.set(key, value, { EX: ttl })
+    await kv.set(key, value, { EX: c.session.ttl })
   }
 
   const cookieOptions = {
@@ -70,7 +80,7 @@ export const createSession = async (c, value, options = {}) => {
     secure: true,
     domain: url.hostname,
     httpOnly: true,
-    maxAge: ttl,
+    maxAge: c.session.ttl,
     // expires: ,
     sameSite: 'Strict',
   }
@@ -103,6 +113,27 @@ export const deleteSession = async (c) => {
     secure: true,
     domain: url.hostname,
   })
+
+  return true
+}
+
+export const renewSession = async (c) => {
+  const { status, value, ttl, key } = c.session;
+
+  if (status) {
+    await createSession(c, value, { ttl, session: key });
+  }
+
+  return true
+}
+
+export const regenerateSession = async (c) => {
+  const { status, value, ttl } = c.session;
+
+  if (status) {
+    await deleteSession(c);
+    await createSession(c, value, { ttl });
+  }
 
   return true
 }

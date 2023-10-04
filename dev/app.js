@@ -1,10 +1,14 @@
 import { Hono } from 'hono'
 import { getRuntimeKey } from 'hono/adapter'
-import { SessionManager, createSession, deleteSession } from '../src'
+import { SessionManager, createSession, deleteSession, renewSession, regenerateSession } from '../src'
 
 const app = new Hono()
 
-app.use('*', SessionManager())
+app.use('*', SessionManager({
+  ttl: 60,
+  renew: true,
+  // regenerate: true,
+}))
 
 app.get('/', async (c) => {
   const { value: user } = c.session
@@ -80,13 +84,16 @@ app.get('/', async (c) => {
       <form action="/renew" method="POST">
         <button>Renew Session</button>
       </form>
+      <form action="/regen" method="POST">
+        <button>Regenerate Session</button>
+      </form>
     </div>
   )
 })
 
 app.post('/', async (c) => {
   const { user } = await c.req.parseBody()
-  await createSession(c, user, { ttl: 30 })
+  await createSession(c, user)
   return c.redirect('/')
 })
 
@@ -96,8 +103,12 @@ app.post('/delete', async (c) => {
 })
 
 app.post('/renew', async (c) => {
-  const { key, value } = c.session
-  await createSession(c, value, { ttl: 30, session: key })
+  await renewSession(c)
+  return c.redirect('/')
+})
+
+app.post('/regen', async (c) => {
+  await regenerateSession(c)
   return c.redirect('/')
 })
 
