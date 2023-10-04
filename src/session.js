@@ -54,7 +54,6 @@ export const denyAccess = (options = {}) => {
 
 export const createSession = async (c, value, options = {}) => {
   let {
-    // ttl = 604800, // 1 week
     session = crypto.randomUUID(),
     secret
   } = options;
