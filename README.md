@@ -43,6 +43,15 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    
      // Secret for Hono's signed cookies
      secret: 'Strong_Secret_123' // Default: null
+
+     // Session TTL. Set for both KV and cookies. Minimum 60.
+     ttl: 60, // Default: 604800 (1 week)
+
+     // Update session TTL for each access.
+     renew: true, // Default: true
+
+     // Update session ID for each access.
+     regenerate: true, // Default: false
    }))
    ```
    - `secret` is secret of Hono's signed cookies (This feature has untested).  
@@ -90,7 +99,6 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    
      // Create session
      await createSession(c, user, {
-       ttl: 86400, // Session TTL. Set for both KV and cookies. Minimum 60.
        secret: 'Strong_Secret_123'// If you are using signed cookie
      })
    
@@ -98,20 +106,19 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    })
    ```
 
-- Renewal session
+<!-- - Renewal session
    ```js
    app.get('/renew', async (c) => {
      const { value, key } = c.session;
    
      // Renewal session
      await createSession(c, user, {
-       ttl: 86400, // Session TTL. Set for both KV and cookies. Minimum 60.
        session: key // You can update it by setting the current session key.
      })
      
      return c.redirect('/')
    })
-   ```
+   ``` -->
 
 - Delete session
    ```js

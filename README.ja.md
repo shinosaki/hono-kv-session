@@ -36,6 +36,15 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    
      // HonoのSigned cookie用のシークレット
      secret: 'Strong_Secret_123' // デフォルト: null
+
+     // セッションのTTL（有効期限の秒数）。 KVとCookieの両方に設定される。 最低値は60（下回る場合は60に設定）
+     ttl: 60, // デフォルト: 604800 (一週間)
+
+     // アクセス毎にセッションの有効期限(TTL)を延長する。
+     renew: true, // デフォルト: true
+
+     // アクセス毎にセッションIDを再生成する。
+     regenerate: true, // デフォルト: false
    }))
    ```
    - `secret`にはHonoのSigned cookie用のシークレットを設定します （ただし、この機能は動作未確認です）。  
@@ -83,7 +92,6 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    
      // セッションを作成
      await createSession(c, user, {
-       ttl: 86400, // セッションのTTL（有効期限の秒数）。 KVとCookieの両方に設定される。 最低値は60（下回る場合は60に設定）
        secret: 'Strong_Secret_123'// Signed Cookieを使う場合はsecretを設定して
      })
    
@@ -91,20 +99,19 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    })
    ```
 
-- セッションの更新
+<!-- - セッションの更新
    ```js
    app.get('/renew', async (c) => {
      const { value, key } = c.session;
    
      // セッションを更新
      await createSession(c, user, {
-       ttl: 86400, // セッションのTTL（有効期限の秒数）。 KVとCookieの両方に設定される。 最低値は60（下回る場合は60に設定）
        session: key // 現在のセッションキーを指定すると、そのクッキーを更新できます
      })
      
      return c.redirect('/')
    })
-   ```
+   ``` -->
 
 - セッションの削除
    KV上のデータとクライアントのCookieを削除します。
