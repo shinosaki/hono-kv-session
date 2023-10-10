@@ -28,11 +28,13 @@
     "build:esm:kv": "esbuild --outdir=dist/kv src/kv/*.js",
     "build:cjs": "esbuild --format=cjs --outdir=dist/cjs src/*.js",
     "build:cjs:kv": "esbuild --format=cjs --outdir=dist/cjs/kv src/kv/*.js",
+    "build:node": "esbuild --outfile=run.cjs --bundle --loader:.js=jsx --platform=node dev/node.js",
     "minify": "npm run minify:session && npm run minify:kv",
     "minify:session": "esbuild --minify --outdir=dist src/index.js src/session.js",
     "minify:kv": "esbuild --minify --outdir=dist/kv src/kv/*",
     "dev": "wrangler dev dev/worker.js",
     "dev:bun": "bun run --hot dev/index.js",
+    "dev:node": "npm run build:node && node run.cjs",
     "deploy": "wrangler deploy --minify dev/worker.js"
   },
   "repository": {
@@ -60,6 +62,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230821.0",
+    "@hono/node-server": "^1.2.0",
     "esbuild": "^0.19.3",
     "wrangler": "^3.7.0"
   }

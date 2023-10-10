@@ -152,7 +152,7 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
 | ✔️ | Bun | ✔️ |
 | ✔️ | Cloudflare Workers | ✔️ |
 | ✔️ | Cloudflare Pages (Functions) | ❌ |
-| ✔️ | Node.js | ❌ |
+| ✔️ | Node.js | ✔️ |
 | ❌ | Deno |  |
 
 ## Dependecies

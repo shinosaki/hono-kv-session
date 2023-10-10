@@ -146,7 +146,7 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
 | ✔️ | Bun | ✔️ |
 | ✔️ | Cloudflare Workers | ✔️ |
 | ✔️ | Cloudflare Pages (Functions) | ❌ |
-| ✔️ | Node.js | ❌ |
+| ✔️ | Node.js | ✔️ |
 | ❌ | Deno |  |
 
 ## 依存関係

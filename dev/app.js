@@ -30,7 +30,7 @@ app.get('/', async (c) => {
         return [ name, value, date.toISOString(), (date - now) / 1000 ]
       })
     )
-  } else if (runtime === 'bun') {
+  } else {
     keys = await c.kv.keys('*');
 
     kvLists = await Promise.all(
