@@ -1,5 +1,5 @@
 # hono-kv-session
-Stateful session middleware for [Hono](https://hono.dev/). Works on Cloudflare Workers, Node.js, Bun, etc.
+Stateful session middleware for [Hono](https://hono.dev/). Works on Cloudflare Workers, Node.js, Bun, Deno, etc.
 
 ステートフルなセッションを提供するHonoのミドルウェアです。Cloudflare WorkersやNode.js、Bunなどの環境で動作します。
 
@@ -29,13 +29,15 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
    import { kvClient } from 'hono-kv-session/cloudflare';
    // If you are using "bun" or "node.js".
    import { kvClient } from 'hono-kv-session/bun';
+   // If you are using "deno"
+   import { kvClient } from 'npm:hono-kv-session/bun';
    
    app.use('*', kvClient());
    ```
 
 - Set `SessionManager()` middleware.
    ```js
-   import { SessionManager, createSession, deleteSession } from 'hono-kv-session'
+   import { SessionManager, createSession, deleteSession } from 'hono-kv-session' // If you are using Deno, replace module name to "npm:hono-kv-session"
    
    app.use('*', SessionManager({
      // Cookie's id
@@ -153,7 +155,8 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
 | ✔️ | Cloudflare Workers | ✔️ |
 | ✔️ | Cloudflare Pages (Functions) | ❌ |
 | ✔️ | Node.js | ✔️ |
-| ❌ | Deno |  |
+| ✔️ | Deno | ✔️ |
+| ❌ | DenoKV |  |
 
 ## Dependecies
 - [hono](https://hono.dev/)

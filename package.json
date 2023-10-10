@@ -35,6 +35,7 @@
     "dev": "wrangler dev dev/worker.js",
     "dev:bun": "bun run --hot dev/index.js",
     "dev:node": "npm run build:node && node run.cjs",
+    "dev:deno": "deno run --allow-net --watch ./dev/deno.tsx",
     "deploy": "wrangler deploy --minify dev/worker.js"
   },
   "repository": {

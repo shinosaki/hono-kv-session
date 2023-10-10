@@ -22,13 +22,15 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    import { kvClient } from 'hono-kv-session/cloudflare';
    // "bun"か"node.js"を利用している場合
    import { kvClient } from 'hono-kv-session/bun';
+   // "deno"を利用している場合
+   import { kvClient } from 'npm:hono-kv-session/bun';
    
    app.use('*', kvClient());
    ```
 
 - `SessionManager()`ミドルウェアの設定
    ```js
-   import { SessionManager, createSession, deleteSession } from 'hono-kv-session'
+   import { SessionManager, createSession, deleteSession } from 'hono-kv-session' // Denoを利用している場合、モジュール名を'npm:hono-kv-session'に置き換えてください
    
    app.use('*', SessionManager({
      // Cookieの名前
@@ -147,7 +149,8 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
 | ✔️ | Cloudflare Workers | ✔️ |
 | ✔️ | Cloudflare Pages (Functions) | ❌ |
 | ✔️ | Node.js | ✔️ |
-| ❌ | Deno |  |
+| ✔️ | Deno | ✔️ |
+| ❌ | DenoKV |  |
 
 ## 依存関係
 - [hono](https://hono.dev/)
