@@ -1,9 +1,9 @@
-import { createClient } from "redis";
+import { createClient } from "redis"
 
-export const kvClient = () => {
+export const kvClient = (options = {}) => {
   return async (c, next) => {
-    c.kv = createClient();
-    await c.kv.connect();
+    c.kv = createClient(options)
+    await c.kv.connect()
 
     await next()
   }
