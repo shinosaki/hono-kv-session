@@ -1,3 +1,18 @@
+## サポートしているキーバリューストア
+- Cloudflare KV
+- Redis ([node-redis](https://github.com/redis/node-redis)を使用)
+- **New!** Deno KV
+
+## サポートしているランタイム
+| 対応 | ランタイム | 動作確認 |
+| --- | --- | --- |
+| ✔️ | Bun | ✔️ |
+| ✔️ | Cloudflare Workers | ✔️ |
+| ✔️ | Cloudflare Pages (Functions) |  |
+| ✔️ | Node.js | ✔️ |
+| ✔️ | Deno (with Redis) | ✔️ |
+| ✔️ | Deno KV | ✔️ |
+
 ## インストール
 ```
 npm install hono-kv-session
@@ -9,24 +24,44 @@ npm install hono-kv-session
      `$ wrangler kv:namespace create SESSION`
   2. `1.`で生成されたUUIDを`wrangler.toml`に設定します。  
      こんな感じ: `{ binding = "SESSION", id = "b80d8fc5924d43ba85b56aa6b6dbb1c3" }`
-- Bun, Node.jsなど。
+- Bun, Node.js, Denoなど
   1. Redisサーバを起動するだけ。  
      systemdの場合: `# systemctl start redis-server`
+- Deno KV  
+  **[Deno KVは現在ベータ版です](https://docs.deno.com/kv/manual)**  
+  このように、Denoプログラムに`--unstable`フラグを付けて実行してください。  
+  ```bash
+  $ deno run --allow-net --watch --unstable app.ts
+  ```
 
 ## 使い方
 Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサンプルコードがあります。
 
-- `kvClient()`ミドルウェアの設定
-   ```js
-   // "Cloudflare Workers"か"Pages Functions"を利用している場合
-   import { kvClient } from 'hono-kv-session/cloudflare';
-   // "bun"か"node.js"を利用している場合
-   import { kvClient } from 'hono-kv-session/bun';
-   // "deno"を利用している場合
-   import { kvClient } from 'npm:hono-kv-session/bun';
-   
-   app.use('*', kvClient());
-   ```
+### KVクライアント
+- **Cloudflare Workers, Cloudflare Pages**
+  ```js
+  import { kvClient } from 'hono-kv-session/cloudflare';
+  app.use('*', kvClient());
+  ```
+
+- **Node.js, Bun, Deno (with Redis)**
+  ```js
+  import { kvClient } from 'hono-kv-session/redis';
+  app.use('*', kvClient());
+
+  // もしくは、node-redisのcreateClient()のオプションを指定できます
+  app.use('*', kvClient({
+    url: 'redis://alice:foobared@awesome.redis.server:6380'
+  }));
+  ```
+
+- **Deno KV**
+  ```js
+  import { kvClient } from 'https://deno.land/x/hono_kv_session/kv/denokv.js';
+  app.use('*', kvClient());
+  ```
+
+### SessionManagerを利用する
 
 - `SessionManager()`ミドルウェアの設定
    ```js
@@ -101,22 +136,15 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
    })
    ```
 
-<!-- - セッションの更新
+- セッションの更新
    ```js
-   app.get('/renew', async (c) => {
-     const { value, key } = c.session;
-   
-     // セッションを更新
-     await createSession(c, user, {
-       session: key // 現在のセッションキーを指定すると、そのクッキーを更新できます
-     })
-     
+   app.post('/renew', async (c) => {
+     await renewSession(c)
      return c.redirect('/')
    })
-   ``` -->
+   ```
 
 - セッションの削除
-   KV上のデータとクライアントのCookieを削除します。
    ```js
    app.post('/logout', async (c) => {
      await deleteSession(c)
@@ -137,20 +165,6 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
     name: 'id' // Cookieの名前
   }
   ```
-
-## サポートしているキーバリューストア
-- Cloudflare KV
-- Redis ([node-redis](https://github.com/redis/node-redis)を使用)
-
-## サポートしているランタイム
-| 対応 | ランタイム | 動作確認 |
-| --- | --- | --- |
-| ✔️ | Bun | ✔️ |
-| ✔️ | Cloudflare Workers | ✔️ |
-| ✔️ | Cloudflare Pages (Functions) | ❌ |
-| ✔️ | Node.js | ✔️ |
-| ✔️ | Deno | ✔️ |
-| ❌ | DenoKV |  |
 
 ## 依存関係
 - [hono](https://hono.dev/)
