@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { Hono } from 'https://deno.land/x/hono/mod.ts'
 import { logger, jsx } from 'https://deno.land/x/hono/middleware.ts'
-import { kvClient } from 'npm:hono-kv-session/bun';
+import { kvClient } from '../src/kv/denokv.js';
 import { SessionManager, createSession, deleteSession, renewSession, regenerateSession } from 'npm:hono-kv-session';
 
 const app = new Hono()
@@ -16,20 +16,20 @@ app.use('*', SessionManager({
 }))
 
 app.get('/', async (c) => {
+  const url = new URL(c.req.url)
   const { value: user } = c.session
 
-  const keys = await c.kv.keys('*');
+  const entries = await c.kv.list({ prefix: ['session', url.hostname] })
 
-  const kvLists = await Promise.all(
-    keys.map(async (name) => {
-      const [ expiration, value ] = await c.kv.multi().ttl(name).get(name).exec()
+  const kvLists = Array.from(entries).map((key) => {
+    console.log(key)
+    const [ expiration, value ] = entry
 
-      const now = Date.now()
-      const date = new Date(now + (expiration * 1000)).toISOString()
+    const now = Date.now()
+    const date = new Date(now + (expiration * 1000)).toISOString()
 
-      return [ name, value, date, expiration ]
-    })
-  )
+    return [ name, value, date, expiration ]
+  })
 
   return c.html(
     <div>

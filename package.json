@@ -1,6 +1,6 @@
 {
   "name": "hono-kv-session",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Stateful session middleware for Hono. Works with Cloudflare KV or node-redis.",
   "files": [
     "dist"
@@ -20,6 +20,10 @@
     "./cloudflare": {
       "import": "./dist/kv/cloudflare.js",
       "require": "./dist/cjs/kv/cloudflare.js"
+    },
+    "./denokv": {
+      "import": "./dist/kv/denokv.js",
+      "require": "./dist/cjs/kv/denokv.js"
     }
   },
   "scripts": {
@@ -35,7 +39,7 @@
     "dev": "wrangler dev dev/worker.js",
     "dev:bun": "bun run --hot dev/index.js",
     "dev:node": "npm run build:node && node run.cjs",
-    "dev:deno": "deno run --allow-net --watch ./dev/deno.tsx",
+    "dev:deno": "deno run --allow-net --watch --unstable ./dev/deno.tsx",
     "deploy": "wrangler deploy --minify dev/worker.js"
   },
   "repository": {
