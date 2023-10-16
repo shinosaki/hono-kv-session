@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { kvClient } from '../src/kv/bun.js'
+import { kvClient } from '../src/kv/redis.js'
 
 const app = new Hono()
 
