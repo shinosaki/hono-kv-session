@@ -6,7 +6,7 @@ const app = new Hono()
 
 app.use('*', SessionManager({
   ttl: 60,
-  renew: true,
+  renew: false,
   // regenerate: true,
 }))
 

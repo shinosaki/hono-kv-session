@@ -1,4 +1,3 @@
-import { getRuntimeKey } from 'hono/adapter'
 import { HTTPException } from 'hono/http-exception'
 import { getCookie, getSignedCookie, setCookie, setSignedCookie, deleteCookie } from 'hono/cookie'
 
@@ -60,7 +59,6 @@ export const createSession = async (c, value, options = {}) => {
 
   const { kv } = c
   const url = new URL(c.req.url)
-  const runtime = getRuntimeKey()
 
   const key = `session:${url.hostname}:${session}`;
 
@@ -68,10 +66,17 @@ export const createSession = async (c, value, options = {}) => {
     c.session.ttl = 60
   }
 
-  if (runtime === 'workerd') {
-    await kv.put(key, value, { expirationTtl: c.session.ttl })
-  } else {
-    await kv.set(key, value, { EX: c.session.ttl })
+  switch (c.kvType) {
+    case 'cloudflare':
+      await kv.put(key, value, { expirationTtl: c.session.ttl })
+      break
+
+    case 'redis':
+      await kv.set(key, value, { EX: c.session.ttl })
+      break
+
+    default:
+      throw new Error('Invalid kvType')
   }
 
   const cookieOptions = {
@@ -97,14 +102,20 @@ export const deleteSession = async (c) => {
   const { kv } = c
   const { name, key } = c.session
   const url = new URL(c.req.url)
-  const runtime = getRuntimeKey()
 
   const kvKey = `session:${url.hostname}:${key}`;
 
-  if (runtime === 'workerd') {
-    await kv.delete(kvKey)
-  } else {
-    await kv.del(kvKey)
+  switch (c.kvType) {
+    case 'cloudflare':
+      await kv.delete(kvKey)
+      break
+
+    case 'redis':
+      await kv.del(kvKey)
+      break
+
+    default:
+      throw new Error('Invalid kvType')
   }
 
   deleteCookie(c, name, {
