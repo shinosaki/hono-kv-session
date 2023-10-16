@@ -21,7 +21,21 @@ export const SessionManager = (options = {}) => {
 
     c.session.ttl = ttl
     c.session.key = (secret) ? await getSignedCookie(c, secret, name) : getCookie(c, name)
-    c.session.value = (c.session.key) && await kv.get(`session:${url.hostname}:${c.session.key}`)
+    if (c.session.key) {
+      switch (c.kvType) {
+        case 'cloudflare':
+        case 'redis':
+          c.session.value = await kv.get(`session:${url.hostname}:${c.session.key}`)
+          break
+
+        case 'denokv':
+          c.session.value = await kv.get(['session', url.hostname, c.session.key])
+          break
+
+        default:
+          throw new Error('Invalid kvType')
+      }
+    }
 
     c.session.status = (!c.session.value) ? false : true;
 
@@ -60,19 +74,21 @@ export const createSession = async (c, value, options = {}) => {
   const { kv } = c
   const url = new URL(c.req.url)
 
-  const key = `session:${url.hostname}:${session}`;
-
   if (c.session.ttl < 60) {
     c.session.ttl = 60
   }
 
   switch (c.kvType) {
     case 'cloudflare':
-      await kv.put(key, value, { expirationTtl: c.session.ttl })
+      await kv.put(`session:${url.hostname}:${session}`, value, { expirationTtl: c.session.ttl })
       break
 
     case 'redis':
-      await kv.set(key, value, { EX: c.session.ttl })
+      await kv.set(`session:${url.hostname}:${session}`, value, { EX: c.session.ttl })
+      break
+
+    case 'denokv':
+      await kv.set(['session', url.hostname, session], value, { expireIn: c.session.ttl * 1000 })
       break
 
     default:
@@ -103,15 +119,17 @@ export const deleteSession = async (c) => {
   const { name, key } = c.session
   const url = new URL(c.req.url)
 
-  const kvKey = `session:${url.hostname}:${key}`;
-
   switch (c.kvType) {
     case 'cloudflare':
-      await kv.delete(kvKey)
+      await kv.delete(`session:${url.hostname}:${key}`)
       break
 
     case 'redis':
-      await kv.del(kvKey)
+      await kv.del(`session:${url.hostname}:${key}`)
+      break
+
+    case 'denokv':
+      await kv.delete(['session', url.hostname, key])
       break
 
     default:
