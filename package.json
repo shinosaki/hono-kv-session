@@ -14,8 +14,16 @@
       "require": "./dist/cjs/index.js"
     },
     "./bun": {
-      "import": "./dist/kv/bun.js",
-      "require": "./dist/cjs/kv/bun.js"
+      "import": "./dist/kv/redis.js",
+      "require": "./dist/cjs/kv/redis.js"
+    },
+    "./node": {
+      "import": "./dist/kv/redis.js",
+      "require": "./dist/cjs/kv/redis.js"
+    },
+    "./redis": {
+      "import": "./dist/kv/redis.js",
+      "require": "./dist/cjs/kv/redis.js"
     },
     "./cloudflare": {
       "import": "./dist/kv/cloudflare.js",
