@@ -29,7 +29,8 @@ export const SessionManager = (options = {}) => {
           break
 
         case 'denokv':
-          c.session.value = await kv.get(['session', url.hostname, c.session.key])
+          const entry = await kv.get(['session', url.hostname, c.session.key]);
+          c.session.value = entry.value;
           break
 
         default:
