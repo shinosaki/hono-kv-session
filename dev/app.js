@@ -17,19 +17,28 @@ app.get('/', async (c) => {
   let keys, kvLists;
 
   if (runtime === 'workerd') {
-    keys = (await c.kv.list()).keys;
+    if ('list' in c.kv) {
+      keys = (await c.kv.list()).keys;
 
-    kvLists = await Promise.all(
-      keys.map(async ({ name, expiration }) => {
-        const value = await c.kv.get(name)
+      kvLists = await Promise.all(
+        keys.map(async ({ name, expiration }) => {
+          const value = await c.kv.get(name)
 
-        const timestamp = expiration * 1000
-        const date = new Date(timestamp)
-        const now = Date.now()
+          const timestamp = expiration * 1000
+          const date = new Date(timestamp)
+          const now = Date.now()
 
-        return [ name, value, date.toISOString(), (date - now) / 1000 ]
+          return [ name, value, date.toISOString(), (date - now) / 1000 ]
+        })
+      )
+    } else {
+      const { results } = await c.kv.prepare('SELECT * FROM session').all()
+      keys = results.map(r => r.key)
+      kvLists = results.map(r => {
+        const date = new Date(r.ttl * 1000)
+        return [r.key, r.value, date.toISOString(), (date.getTime() - Date.now()) / 1000]
       })
-    )
+    }
   } else {
     keys = await c.kv.keys('*');
 

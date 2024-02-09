@@ -13,6 +13,7 @@ export const SessionManager = (options = {}) => {
   return async (c, next) => {
     c.session = { name }
     const url = new URL(c.req.url)
+    const timestamp = Date.now() / 1000
     const { kv } = c
 
     if (!kv) {
@@ -31,6 +32,15 @@ export const SessionManager = (options = {}) => {
         case 'denokv':
           const entry = await kv.get(['session', url.hostname, c.session.key]);
           c.session.value = entry.value;
+          break
+
+        case 'd1':
+          const result = await kv.prepare('SELECT value, ttl FROM session WHERE key = ?1')
+            .bind(c.session.key)
+            .first()
+          c.session.value = (result.ttl > timestamp)
+            ? result.value
+            : null
           break
 
         default:
@@ -74,6 +84,7 @@ export const createSession = async (c, value, options = {}) => {
 
   const { kv } = c
   const url = new URL(c.req.url)
+  const timestamp = Date.now() / 1000
 
   if (c.session.ttl < 60) {
     c.session.ttl = 60
@@ -90,6 +101,12 @@ export const createSession = async (c, value, options = {}) => {
 
     case 'denokv':
       await kv.set(['session', url.hostname, session], value, { expireIn: c.session.ttl * 1000 })
+      break
+
+    case 'd1':
+      await kv.prepare('REPLACE INTO session (key, value, ttl) VALUES (?1, ?2, ?3)')
+        .bind(session, value, (timestamp + c.session.ttl))
+        .run()
       break
 
     default:
@@ -131,6 +148,12 @@ export const deleteSession = async (c) => {
 
     case 'denokv':
       await kv.delete(['session', url.hostname, key])
+      break
+
+    case 'd1':
+      await kv.prepare('DELETE FROM session WHERE key = ?1')
+        .bind(key)
+        .run()
       break
 
     default:

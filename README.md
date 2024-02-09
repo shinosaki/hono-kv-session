@@ -13,7 +13,8 @@ Stateful session middleware for [Hono](https://hono.dev/). Works on Cloudflare W
 ## Supported Key-Value stores
 - Cloudflare KV
 - Redis (with [node-redis](https://github.com/redis/node-redis))
-- **New!** Deno KV
+- Deno KV
+- **New!** Cloudflare D1 (sqlite)
 
 ## Supported Runtimes
 | Supported | Runtime | Tested |
@@ -45,6 +46,18 @@ npm install hono-kv-session
   ```bash
   $ deno run --allow-net --watch --unstable app.ts
   ```
+- Cloudflare D1
+  1. Create D1 Database.
+     `$ wrangler d1 create session-db`
+  2. Update D1's `database_id` to `wrangler.toml`.
+     ```toml
+     [[ d1_databases ]]
+     binding = "SESSION_DB"
+     database_name = "session-db"
+     database_id = "<Unique ID for Your Database Here>"
+     preview_database_id = "local"
+     ```
+  3. Run `$ npm run d1:init`
 
 ## Usage
 You can see the sample code in the [`./dev`](./dev) directory in Github.
@@ -70,6 +83,12 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
 - **Deno KV**
   ```js
   import { kvClient } from 'https://deno.land/x/hono_kv_session/kv/denokv.js';
+  app.use('*', kvClient());
+  ```
+
+- **Cloudflare D1**
+  ```js
+  import { kvClient } from 'hono-kv-session/d1';
   app.use('*', kvClient());
   ```
 

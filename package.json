@@ -32,6 +32,10 @@
     "./denokv": {
       "import": "./dist/kv/denokv.js",
       "require": "./dist/cjs/kv/denokv.js"
+    },
+    "./d1": {
+      "import": "./dist/kv/d1.js",
+      "require": "./dist/cjs/kv/d1.js"
     }
   },
   "scripts": {
@@ -48,6 +52,8 @@
     "dev:bun": "bun run --hot dev/index.js",
     "dev:node": "npm run build:node && node run.cjs",
     "dev:deno": "deno run --allow-net --watch --unstable ./dev/deno.tsx",
+    "dev:d1": "wrangler dev dev/d1.js",
+    "d1:init": "wrangler d1 migrations apply session-db",
     "deploy": "wrangler deploy --minify dev/worker.js"
   },
   "repository": {

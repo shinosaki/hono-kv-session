@@ -1,7 +1,8 @@
 ## サポートしているキーバリューストア
 - Cloudflare KV
 - Redis ([node-redis](https://github.com/redis/node-redis)を使用)
-- **New!** Deno KV
+- Deno KV
+- **New!** Cloudflare D1 (sqlite)
 
 ## サポートしているランタイム
 | 対応 | ランタイム | 動作確認 |
@@ -33,6 +34,18 @@ npm install hono-kv-session
   ```bash
   $ deno run --allow-net --watch --unstable app.ts
   ```
+- Cloudflare D1
+  1. D1データベースを作成します
+     `$ wrangler d1 create session-db`
+  2. `wrangler.toml`の`database_id`を**1.**で出力されたIDと置き換えます
+     ```toml
+     [[ d1_databases ]]
+     binding = "SESSION_DB"
+     database_name = "session-db"
+     database_id = "<ここにIDを入力します>"
+     preview_database_id = "local"
+     ```
+  3. `$ npm run d1:init`を実行します
 
 ## 使い方
 Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサンプルコードがあります。
@@ -58,6 +71,12 @@ Githubの[`./dev`](./dev)ディレクトリに`hono-kv-session`を使ったサ�
 - **Deno KV**
   ```js
   import { kvClient } from 'https://deno.land/x/hono_kv_session/kv/denokv.js';
+  app.use('*', kvClient());
+  ```
+
+- **Cloudflare D1**
+  ```js
+  import { kvClient } from 'hono-kv-session/d1';
   app.use('*', kvClient());
   ```
 
