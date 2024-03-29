@@ -99,10 +99,10 @@ You can see the sample code in the [`./dev`](./dev) directory in Github.
   
   app.use('*', SessionManager({
     // Cookie's id
-    name: 'session_cookie' // Default: 'id'
+    name: 'session_cookie', // Default: 'id'
   
     // Secret for Hono's signed cookies
-    secret: 'Strong_Secret_123' // Default: null
+    secret: 'Strong_Secret_123', // Default: null
 
     // Session TTL. Set for both KV and cookies. Minimum 60.
     ttl: 60, // Default: 604800 (1 week)
